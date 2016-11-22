@@ -6,6 +6,7 @@
 #   EQ_LAT
 #   EQ_LON
 #   EQ_RADIUS
+#   EQ_NOCACHE
 #
 # Dependencies: curl, jq >= 1.5
 # Earthquake data source API:
@@ -22,7 +23,10 @@ LON=${EQ_LON:-139.6917}
 # Radius in km
 RADIUS=${EQ_RADIUS:-300}
 
-curl "http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=${LAT}&longitude=${LON}&maxradiuskm=${RADIUS}&orderby=time-asc" 2>/dev/null | \
+# Cache control
+SUFFIX=${EQ_NOCACHE:+&$RANDOM}
+
+curl "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=${LAT}&longitude=${LON}&maxradiuskm=${RADIUS}&orderby=time-asc$SUFFIX" 2>/dev/null | \
     jq -r --arg LAT $LAT --arg LON $LON '
         def dist(lat1; lon1; lat2; lon2):
             6371 as $R |
